@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     make \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    pip uninstall uwsgi && \
+    pip uninstall uwsgi -y && \
     pip3 install -r requirements.txt
 
 RUN mkdir -p /etc/uwsgi && \
