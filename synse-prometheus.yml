@@ -1,0 +1,8 @@
+version: "2"
+services:
+  synse-prometheus:
+    container_name: synse-prometheus
+    image: vaporio/synse-prometheus
+
+    ports:
+      - 9243:9243

@@ -1,0 +1,30 @@
+FROM vaporio/vapor-endpoint-base-x64:1.0
+MAINTAINER Klemente Gilbert-Espada <klemente@vapor.io>
+
+ADD ./prometheus/requirements.txt requirements.txt
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-dev \
+    make \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip uninstall uwsgi && \
+    pip3 install -r requirements.txt
+
+RUN mkdir -p /etc/uwsgi && \
+    touch /etc/uwsgi/reload && \
+    chown -R www-data:www-data /etc/uwsgi
+
+ADD . /synse-prometheus
+WORKDIR /synse-prometheus
+
+# run command for nginx configuration
+RUN ln -s /synse-prometheus/prometheus_nginx.conf /etc/nginx/sites-enabled/nginx.conf
+
+# Expose our API endpoint port.
+EXPOSE 9243
+
+# Define default command
+CMD ["./start_synse_prometheus.sh"]
