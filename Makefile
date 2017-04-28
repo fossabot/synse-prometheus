@@ -9,13 +9,13 @@
 # ------------------------------------------------------------------------
 
 run: build
-	docker-compose -f synse-prometheus.yml up -d
+	docker-compose -f compose/release.yml up -d
 
 down:
-	docker-compose -f synse-prometheus.yml -f compose/release.yml down --remove-orphans
+	docker-compose -f compose/release.yml down --remove-orphans
 
 build:
-	docker build -f Dockerfile.x64 \
+	docker build -f dockerfile/release.dockerfile \
 		-t vaporio/synse-prometheus:latest .
 
 # -----------------------------------------------
