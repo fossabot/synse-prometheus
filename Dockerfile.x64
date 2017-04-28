@@ -16,10 +16,7 @@ RUN set -e; \
   pip3 install -r requirements.txt ; \
   apk del .build-deps
 
-RUN mkdir -p /etc/uwsgi && \
-    touch /etc/uwsgi/reload && \
-    chown -R www-data:www-data /etc/uwsgi && \
-    mkdir /run/nginx && \
+RUN mkdir /run/nginx && \
     chown -R www-data:www-data /var/lib/nginx && \
     chown -R www-data:www-data /run/nginx && \
     mkdir /logs && \
