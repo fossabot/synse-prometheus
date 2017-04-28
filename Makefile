@@ -12,7 +12,7 @@ run: build
 	docker-compose -f compose/release.yml up -d
 
 down:
-	docker-compose -f compose/release.yml -f compose/release.yml down --remove-orphans
+	docker-compose -f compose/release.yml down --remove-orphans
 
 build:
 	docker build -f dockerfile/release.dockerfile \
