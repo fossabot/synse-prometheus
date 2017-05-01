@@ -23,6 +23,11 @@ parser.add(
     env_var='SYNSE_SERVER',
     default='localhost:5000',
     help='Path to the synse-server to use. example: "localhost:5000"')
+parser.add(
+    '--api-version',
+    env_var='SYNSE_API_VERSION',
+    default='1.3',
+    help='Synse API version used for URL construction.')
 
 options = None
 

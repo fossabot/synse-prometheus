@@ -27,7 +27,7 @@ def setup_logging(name="logging.json"):
 app = Flask(__name__)
 
 
-@app.route('/prometheus/test', methods=['GET', 'POST'])
+@app.route('/test', methods=['GET', 'POST'])
 def test_routine():
     """ Test routine to verify the endpoint is running and ok
     without relying on other dependencies.
@@ -35,7 +35,7 @@ def test_routine():
     return jsonify({'status': 'ok'})
 
 app.add_url_rule(
-    '/prometheus/metrics',
+    '/metrics',
     view_func=prometheus_endpoint.prometheus.metrics
 )
 
