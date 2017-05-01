@@ -15,6 +15,7 @@ import prometheus_client.exposition
 from apscheduler.schedulers.background import BackgroundScheduler
 from prometheus_client.core import _INF
 from pytz import utc
+from . import config
 
 query = '''{
     racks {
@@ -122,11 +123,18 @@ summary = prometheus_client.Summary('device_refresh_seconds', '')
 
 @summary.time()
 def get():
-    r = requests.get(
-        'http://192.168.99.100:5001/opendcre/1.3/graphql',
-        params={'query': query}
-    )
-    result = r.json()
+    _synse_server = config.options.get('synse_server')
+    try:
+        r = requests.get(
+            'http://{}/opendcre/1.3/graphql'.format(_synse_server),
+            params={'query': query}
+        )
+        result = r.json()
+    except Exception as e:
+        logging.error(
+            'Unexpected error querying {} : {}'.format(_synse_server, e)
+        )
+        result = {}
 
     if result.get('errors'):
         for error in result.errors:
