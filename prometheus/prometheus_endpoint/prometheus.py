@@ -146,9 +146,10 @@ def get():
 
 def get_query():
     _synse_server = config.options.get('synse_server')
+    _api_version = config.options.get('api_version')
     try:
         r = requests.get(
-            'http://{}/opendcre/1.3/graphql'.format(_synse_server),
+            'http://{}/opendcre/{}/graphql'.format(_synse_server, _api_version),
             params={'query': query}
         )
         return r.json()

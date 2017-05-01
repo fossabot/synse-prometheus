@@ -5,7 +5,7 @@ ADD ./prometheus/requirements.txt requirements.txt
 
 # Install dependencies
 RUN set -e; \
-  pip3 install -r requirements.txt ;
+  pip3 install -r requirements.txt
 
 RUN mkdir /logs
 
