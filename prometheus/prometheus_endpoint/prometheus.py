@@ -41,31 +41,31 @@ query = '''{
 }'''
 
 _metrics = {
-    "histogram": {},
-    "gauge": {}
+    'histogram': {},
+    'gauge': {}
 }
 
 
 class Device(object):
 
     default_labels = [
-        "rack_id",
-        "board_id",
-        "device_id",
-        "device_info",
-        "device_type"
+        'rack_id',
+        'board_id',
+        'device_id',
+        'device_info',
+        'device_type'
     ]
 
     _filter_keys = [
-        "id",
-        "info",
-        "device_type"
+        'id',
+        'info',
+        'device_type'
     ]
 
     _buckets = {
-        "fan_speed": list(range(0, 8500, 500)) + [_INF],
-        "temperature": list(range(0, 95, 5)) + [_INF],
-        "power": list(range(0, 400, 10)) + [_INF]
+        'fan_speed': list(range(0, 8500, 500)) + [_INF],
+        'temperature': list(range(0, 95, 5)) + [_INF],
+        'power': list(range(0, 400, 10)) + [_INF]
     }
 
     def __init__(self, rack, board, device):
@@ -75,15 +75,15 @@ class Device(object):
 
     @property
     def type(self):
-        return self._device.get("device_type")
+        return self._device.get('device_type')
 
     @property
     def labels(self):
         return [
-            self._rack.get("id"),
-            self._board.get("id"),
-            self._device.get("id"),
-            self._device.get("info"),
+            self._rack.get('id'),
+            self._board.get('id'),
+            self._device.get('id'),
+            self._device.get('info'),
             self.type
         ]
 
@@ -115,7 +115,7 @@ class Device(object):
                 self.get_metric('gauge', k).set(v)
                 self.get_metric('histogram', k).observe(v)
             except Exception as ex:
-                logging.error("failed to log metric: {0}".format(self.type))
+                logging.error('failed to log metric: {0}'.format(self.type))
 
 
 summary = prometheus_client.Summary('device_refresh_seconds', '')
@@ -123,36 +123,40 @@ summary = prometheus_client.Summary('device_refresh_seconds', '')
 
 @summary.time()
 def get():
+    result = get_query()
+
+    if result.get('errors'):
+        for error in result['errors']:
+            logging.exception('Query Error', exc_info=error)
+            if hasattr(error, 'message'):
+                logging.debug(error.message)
+
+    if result.get('data'):
+        for rack in result['data'].get('racks'):
+            if not rack:
+                continue
+            for board in rack.get('boards'):
+                if not board:
+                    continue
+                for device in board.get('devices'):
+                    if not device:
+                        continue
+                    Device(rack, board, device).record()
+
+
+def get_query():
     _synse_server = config.options.get('synse_server')
     try:
         r = requests.get(
             'http://{}/opendcre/1.3/graphql'.format(_synse_server),
             params={'query': query}
         )
-        result = r.json()
+        return r.json()
     except Exception as e:
         logging.error(
             'Unexpected error querying {} : {}'.format(_synse_server, e)
         )
-        result = {}
-
-    if result.get('errors'):
-        for error in result.errors:
-            logging.exception("Query error", exc_info=error)
-            if hasattr(error, "message"):
-                logging.debug(error.message)
-
-    if result.get('data'):
-        for rack in result['data'].get("racks"):
-            if not rack:
-                continue
-            for board in rack.get("boards"):
-                if not board:
-                    continue
-                for device in board.get("devices"):
-                    if not device:
-                        continue
-                    Device(rack, board, device).record()
+        return {}
 
 
 def refresh():
