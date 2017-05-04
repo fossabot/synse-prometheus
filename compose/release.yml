@@ -4,5 +4,4 @@ services:
     container_name: synse-prometheus
     image: vaporio/synse-prometheus
 
-    ports:
-      - 9243:9243
+    network_mode: host
