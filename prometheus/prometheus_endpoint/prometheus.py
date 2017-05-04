@@ -149,7 +149,7 @@ def get_query():
     _api_version = config.options.get('api_version')
     try:
         r = requests.get(
-            'http://{}/opendcre/{}/graphql'.format(_synse_server, _api_version),
+            'http://{}/synse/{}/graphql'.format(_synse_server, _api_version),
             params={'query': query}
         )
         return r.json()
