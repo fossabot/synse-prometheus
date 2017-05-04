@@ -3,5 +3,7 @@ services:
   synse-prometheus:
     container_name: synse-prometheus
     image: vaporio/synse-prometheus
-
+    build:
+      context: ..
+      dockerfile: dockerfile/release.dockerfile
     network_mode: host
