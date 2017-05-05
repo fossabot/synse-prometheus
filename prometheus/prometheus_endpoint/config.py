@@ -26,7 +26,7 @@ parser.add(
 parser.add(
     '--api-version',
     env_var='SYNSE_API_VERSION',
-    default='1.3',
+    default='1.4',
     help='Synse API version used for URL construction.')
 
 options = None
