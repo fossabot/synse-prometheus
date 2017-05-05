@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python /synse-prometheus/prometheus/runserver.py
+python /synse-prometheus/runserver.py

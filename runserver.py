@@ -9,7 +9,7 @@
 """
 
 from prometheus_endpoint import config
-from prometheus_endpoint import app, main, setup_logging
+from prometheus_endpoint import main, setup_logging
 
 
 if __name__ == '__main__':
