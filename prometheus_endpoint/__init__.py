@@ -17,11 +17,12 @@ from flask import Flask, jsonify
 import prometheus_endpoint.config
 import prometheus_endpoint.prometheus
 
+
 def setup_logging(name="logging.json"):
     path = os.path.join(os.path.dirname(__file__), "..", name)
     with open(path, 'rt') as f:
-        config = json.load(f)
-    logging.config.dictConfig(config)
+        _config = json.load(f)
+    logging.config.dictConfig(_config)
 
 
 app = Flask(__name__)

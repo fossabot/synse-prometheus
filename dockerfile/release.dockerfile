@@ -1,7 +1,7 @@
 FROM python:3.6-alpine
 MAINTAINER Klemente Gilbert-Espada <klemente@vapor.io>
 
-ADD ./prometheus/requirements.txt requirements.txt
+ADD ./requirements.txt requirements.txt
 
 # Install dependencies
 RUN set -e; \
