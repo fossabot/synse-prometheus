@@ -21,6 +21,14 @@ build:
 	docker build -f dockerfile/release.dockerfile \
 		-t vaporio/synse-prometheus:latest .
 
+build-test:
+	docker-compose -f compose/test.yml build
+
+test: build-test
+	docker-compose -f compose/test.yml up -d
+	docker exec -i synse-prometheus-test /bin/sh -c tox
+
+
 # -----------------------------------------------
 # Docker Cleanup
 #
