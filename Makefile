@@ -11,6 +11,9 @@
 run: build
 	docker-compose -f compose/release.yml up -d
 
+dev: build run
+	docker exec -ti synse-prometheus /bin/sh
+
 down:
 	docker-compose -f compose/release.yml down --remove-orphans
 
