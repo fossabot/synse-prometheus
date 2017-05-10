@@ -15,7 +15,6 @@ services:
     build:
       context: ..
       dockerfile: dockerfile/release.dockerfile
-    network_mode: host
 
   synse-server:
     container_name: synse-server

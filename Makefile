@@ -27,7 +27,11 @@ build-test:
 test: build-test
 	docker-compose -f compose/test.yml up -d
 	docker exec -i synse-prometheus-test /bin/sh -c tox
+	docker-compose -f compose/test.yml down --remove-orphans
 
+dev-test: build-test
+	docker-compose -f compose/test.yml up -d
+	docker exec -it synse-prometheus-test /bin/sh
 
 # -----------------------------------------------
 # Docker Cleanup
