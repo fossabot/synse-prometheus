@@ -11,8 +11,9 @@
 run: build
 	docker-compose -f compose/release.yml up -d
 
-dev: build run
-	docker exec -ti synse-prometheus /bin/sh
+dev: build-test
+	docker-compose -f compose/test.yml up -d
+	docker exec -it synse-prometheus-test /bin/sh
 
 down:
 	docker-compose -f compose/release.yml down --remove-orphans
@@ -20,6 +21,15 @@ down:
 build:
 	docker build -f dockerfile/release.dockerfile \
 		-t vaporio/synse-prometheus:latest .
+
+build-test:
+	docker-compose -f compose/test.yml build
+
+test: build-test
+	docker-compose -f compose/test.yml up -d
+	docker exec -i synse-prometheus-test /bin/sh -c tox
+	$(call down)
+
 
 # -----------------------------------------------
 # Docker Cleanup
