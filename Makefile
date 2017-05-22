@@ -11,9 +11,10 @@
 run: build
 	docker-compose -f compose/release.yml up -d
 
-dev: build-test
-	docker-compose -f compose/test.yml up -d
-	docker exec -it synse-prometheus-test /bin/sh
+dev:
+	docker-compose -f compose/test.yml up -d --build
+	-docker exec -it synse-prometheus /bin/sh
+	docker-compose -f compose/test.yml down --remove-orphans
 
 down:
 	docker-compose -f compose/release.yml down --remove-orphans
@@ -25,10 +26,10 @@ build:
 build-test:
 	docker-compose -f compose/test.yml build
 
-test: build-test
-	docker-compose -f compose/test.yml up -d
-	docker exec -i synse-prometheus-test /bin/sh -c tox
-	$(call down)
+test:
+	docker-compose -f compose/test.yml up -d --build
+	-docker exec -i synse-prometheus /bin/sh -c tox
+	docker-compose -f compose/test.yml down --remove-orphans
 
 
 # -----------------------------------------------

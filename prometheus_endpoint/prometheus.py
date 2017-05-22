@@ -35,6 +35,9 @@ query = '''{
                 ... on PowerDevice {
                     input_power
                 }
+                ... on VoltageDevice {
+                    voltage
+                }
             }
         }
     }
@@ -65,7 +68,8 @@ class Device(object):
     _buckets = {
         'fan_speed': list(range(0, 8500, 500)) + [_INF],
         'temperature': list(range(0, 95, 5)) + [_INF],
-        'power': list(range(0, 400, 10)) + [_INF]
+        'power': list(range(0, 400, 10)) + [_INF],
+        'voltage': [0, _INF]
     }
 
     def __init__(self, rack, board, device):
@@ -115,7 +119,8 @@ class Device(object):
                 self.get_metric('gauge', k).set(v)
                 self.get_metric('histogram', k).observe(v)
             except Exception as ex:
-                logging.error('failed to log metric: {0}'.format(self.type))
+                logging.exception(
+                    'failed to log metric: {0}'.format(self.type))
 
 
 summary = prometheus_client.Summary('device_refresh_seconds', '')
