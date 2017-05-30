@@ -20,6 +20,7 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -87,3 +88,11 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.vagrant
+.idea
+.DS_Store
+
+# packages
+*.rpm
+*.deb
