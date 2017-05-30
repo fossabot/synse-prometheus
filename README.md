@@ -12,8 +12,8 @@ The synse-prometheus container also has a /test endpoint which is used for verif
 ## Running a Prometheus server
 Here is a sample configuration file for a Prometheus server that can be run on localhost, or in a Docker container. Complete documentation can be found here: https://prometheus.io/docs/introduction/install/
 
-To run a Prometheus Docker container, create a local configuration file ```prometheus.yml``` using the snippet below as a template.
-Update the ```- targets``` field to point to the synse-prometheus container.
+To run a Prometheus Docker container, create a local configuration file `prometheus.yml` using the snippet below as a template.
+Update the `- targets` field to point to the synse-prometheus container.
 ```
 global:
   scrape_interval:     15s
@@ -27,9 +27,10 @@ scrape_configs:
     static_configs:
       - targets: ['192.168.99.100:9243']
 ```
+
 Then use the Docker command below to mount the config file and start the container.
 ```
-docker run -p 9090:9090 -v <local_config_directory>/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+docker run -p 9090:9090 -v `pwd`/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
 ```
 
 Prometheus is visible at localhost:9090
