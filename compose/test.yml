@@ -1,26 +1,25 @@
 version: "2"
 services:
   synse-prometheus-test:
-    container_name: synse-prometheus-test
+    container_name: synse-prometheus
     image: vaporio/synse-prometheus-test
     build:
       context: ..
       dockerfile: dockerfile/test.dockerfile
     links:
-      - synse-prometheus
-
-  synse-prometheus:
-    container_name: synse-prometheus
-    image: vaporio/synse-prometheus
-    build:
-      context: ..
-      dockerfile: dockerfile/release.dockerfile
+      - synse-server
+    volumes:
+      - ..:/synse-prometheus
+    command: ./start_synse_prometheus.sh
 
   synse-server:
     container_name: synse-server
     image: vaporio/synse-server
     ports:
       - 5000
+    volumes:
+      - ../tests/config/bmc.json:/synse/bmc_config.json
+      - ../tests/config/ipmi.json:/synse/override/config.json
     links:
       - ipmi-emulator:ipmi-emulator-1-1
       - ipmi-emulator:ipmi-emulator-1-2
@@ -62,5 +61,6 @@ services:
   ipmi-emulator:
     container_name: synse-server-ipmi-emulator
     image: vaporio/ipmi-emulator-x64
+    restart: on-failure
     ports:
       - 623
