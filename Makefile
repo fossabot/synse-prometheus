@@ -8,82 +8,57 @@
 #  Date:   27 April 2017
 # ------------------------------------------------------------------------
 
-run: build
-	docker-compose -f compose/release.yml up -d
+IMG_NAME := vaporio/synse-prometheus
+PKG_VER := $(shell python synse_prometheus/__init__.py)
+export GIT_VER := $(shell /bin/sh -c "git log --pretty=format:'%h' -n 1 || echo 'none'")
 
-dev:
-	docker-compose -f compose/test.yml up -d --build
-	-docker exec -it synse-prometheus /bin/sh
-	docker-compose -f compose/test.yml down --remove-orphans
-
-down:
-	docker-compose -f compose/release.yml down --remove-orphans
-
+.PHONY: build
 build:
-	docker build -f dockerfile/release.dockerfile \
-		-t vaporio/synse-prometheus:latest .
+	docker build -f dockerfile/base.dockerfile \
+		-t ${IMG_NAME}:latest \
+		-t ${IMG_NAME}:${PKG_VER} \
+		-t ${IMG_NAME}:${GIT_VER} .
 
-build-test:
-	docker-compose -f compose/test.yml build
-
+.PHONY: test
 test:
-	docker-compose -f compose/test.yml up -d --build
-	-docker exec -i synse-prometheus /bin/sh -c tox
-	docker-compose -f compose/test.yml down --remove-orphans
+	docker-compose -f compose/base.yml -f compose/dev.yml -f compose/test.yml up \
+	  --build \
+	  --abort-on-container-exit \
+	  --exit-code-from synse-prometheus
 
+.PHONY: dev
+dev:
+	docker-compose -f compose/base.yml -f compose/dev.yml up \
+		-d \
+		--build
+	-docker exec -it synse-prometheus /bin/sh
+	$(MAKE) down
 
-# -----------------------------------------------
-# Docker Cleanup
-#
-# NOTE:
-#   these recipes are primarily used in development. caution should
-#   be taken when using them, as they are NOT OpenDCRE-specific. they
-#   will affect ALL containers/images on the host.
-# -----------------------------------------------
-RUNNING_CONTAINER_IDS=$(shell docker ps -q)
-ALL_CONTAINER_IDS=$(shell docker ps -aq)
-DANGLING_IMAGES=$(shell docker images -a -q -f dangling=true)
+.PHONY: run
+run:
+	docker-compose -f compose/base.yml -f compose/dev.yml -f compose/run.yml up \
+		-d \
+		--build
 
-# untagged images will only have an image id. repository and name are <none>.
-ALL_UNTAGGED_IMAGES=$(shell docker images | grep "^<none>" | awk '{print $$3}')
-# tagged images will have a repository and tag. The image id may not be unique which causes errors on multiple deletes.
-ALL_TAGGED_IMAGES=$(shell docker images | grep -v REPOSITORY | grep -v "^<none>" | awk '{print $$1":"$$2}')
+.PHONY: circleci
+circleci:
+	docker-compose -f compose/base.yml -f compose/test.yml -f compose/test-circleci.yml up \
+	  --build \
+	  --abort-on-container-exit \
+	  --exit-code-from synse-prometheus
 
-TEST_IMAGES=$(shell docker images | awk '$$1 ~ /test/ { print $$3 }')
-LATEST_OLD=$(shell docker images | grep 'latest-old' | awk '{ print $$1":latest-old" }')
-DATE_TAG=$(shell docker images | grep '[0-9]\{6\}-[0-9]\{4\}' | awk '{ print $$1":"$$2 }' )
+.PHONY: down
+down:
+	docker-compose -f compose/base.yml -f compose/dev.yml down
 
-clean-date-tags:
-	@if [ -z "$(DATE_TAG)" ]; then echo "No images found with date tags."; else docker rmi $(DATE_TAG); fi;
+.PHONY: logs
+logs:
+	docker-compose -f compose/base.yml -f compose/dev.yml logs
 
-clean-latest-old:
-	@if [ -z "$(LATEST_OLD)" ]; then echo "No latest-old images tagged."; else docker rmi -f $(LATEST_OLD); fi;
-
-stop-containers:
-	@if [ -z  "$(RUNNING_CONTAINER_IDS)" ]; then echo "No running containers to stop."; else docker stop $(RUNNING_CONTAINER_IDS); fi;
-
-delete-containers:
-	@if [ -z "$(ALL_CONTAINER_IDS)" ]; then echo "No containers to remove."; else docker rm $(ALL_CONTAINER_IDS); fi;
-
-delete-untagged-images:
-	@if [ -z "$(ALL_UNTAGGED_IMAGES)" ]; then echo "No untagged images to remove."; else docker rmi -f $(ALL_UNTAGGED_IMAGES); fi;
-
-delete-tagged-images:
-	@if [ -z "$(ALL_TAGGED_IMAGES)" ]; then echo "No tagged images to remove."; else docker rmi -f $(ALL_TAGGED_IMAGES); fi;
-
-delete-images: delete-untagged-images delete-tagged-images
-
-delete-test-images:
-	@if [ -z "$(TEST_IMAGES)" ]; then echo "No test images to remove"; else docker rmi -f $(TEST_IMAGES); fi;
-
-delete-dangling:
-	@if [ -z "$(DANGLING_IMAGES)" ]; then echo "No dangling images to remove."; else docker rmi -f $(DANGLING_IMAGES); fi;
-
-clean-hard:
-	@if [ -z "$(ALL_CONTAINER_IDS)" ]; then echo "No containers to stop and remove."; else docker rm -f $(ALL_CONTAINER_IDS); fi;
-
-clean-volatile: stop-containers delete-containers delete-dangling
-
-delete-all: stop-containers delete-containers delete-images
-
-clean: delete-all
+.PHONY: config-volume
+config-volume:
+	docker volume create source
+	docker run -v config:/scratch --name helper busybox true
+	docker cp config/bmc.json helper:/scratch
+	docker cp config/config.json helper:/scratch
+	docker rm helper

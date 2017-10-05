@@ -10,7 +10,7 @@
 import configargparse
 
 parser = configargparse.ArgParser(default_config_files=[
-    "/prometheus_endpoint/config.yml"
+    "/code/config.yml"
 ])
 parser.add('-c', '--my-config', is_config_file=True, help='config file path')
 parser.add(
@@ -19,15 +19,10 @@ parser.add(
     default=9243,
     help='Port to listen on.')
 parser.add(
-    '--synse-server',
-    env_var='SYNSE_SERVER',
-    default='localhost:5000',
-    help='Path to the synse-server to use. example: "localhost:5000"')
-parser.add(
-    '--api-version',
-    env_var='SYNSE_API_VERSION',
-    default='1.4',
-    help='Synse API version used for URL construction.')
+    '--synse-graphql',
+    env_var='SYNSE_GRAPHQL',
+    default='synse-graphql:5001',
+    help='Path to synse-grapql to use. example: "localhost:5001"')
 
 options = None
 
