@@ -1,4 +1,4 @@
-synse-promethus is a prometheus exporter for synse-server's metrics. This enables you to ingest all your metrics into prometheus and use it for alerting/monitoring.
+synse-prometheus provides a [Prometheus][prometheus] exporter for the metrics being provided by your data center and IT equipment. You can use this, in conjunction with Prometheus to monitor these metrics and alert on them.
 
 # Kick the tires
 
@@ -60,3 +60,4 @@ tox
 See [nosetests](http://nose.readthedocs.io/en/latest/usage.html) for some more examples. Adding `@attr('now')` to the top of a function is a really convenient way to just run a single test.
 
 [prometheus-docs]: https://prometheus.io/docs/introduction/install/
+[prometheus]: https://prometheus.io/
