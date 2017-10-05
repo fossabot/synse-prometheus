@@ -1,0 +1,10 @@
+version: "3"
+services:
+  synse-prometheus:
+    container_name: synse-prometheus
+    image: vaporio/synse-prometheus:${GIT_VER}
+    build:
+      context: ..
+      dockerfile: dockerfile/base.dockerfile
+    ports:
+      - 9243:9243

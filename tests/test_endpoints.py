@@ -8,27 +8,22 @@
 
 -------------------------------
 Copyright (C) 2015-17  Vapor IO
-
-This file is part of Synse.
-
-Synse is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-Synse is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Synse.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+import json
+
 import testtools
 from requests import get
 
+import synse_prometheus.app
+
 
 class TestEndpoints(testtools.TestCase):
+
+    def setUp(self):
+        super(TestEndpoints, self).setUp()
+        synse_prometheus.app.app.testing = True
+        self.app = synse_prometheus.app.app.test_client()
 
     def request(self, url):
         """ Helper function for making get requests.
@@ -43,18 +38,20 @@ class TestEndpoints(testtools.TestCase):
         """ Hit the /test endpoint and confirm that it returns
         the correct response.
         """
-        response = self.request('http://synse-prometheus:9243/test').json()
-        self.assertEqual(response['status'], 'ok')
+        response = self.app.get('/test')
+        self.assertEqual(
+            json.loads(response.get_data(True)).get('status'), 'ok')
 
     def test_metrics_endpoint(self):
         """ Hit the /metrics endpoint twice, confirming that it returns
         different results after more data has been collected.
         """
-        first_response = self.request('http://synse-prometheus:9243/metrics')
+        first_response = self.app.get('/metrics')
 
         # Hit the test endpoint in order to
         # update the results from the metrics endpoint
-        self.request('http://synse-prometheus:9243/test')
+        self.app.get('/test')
 
-        second_response = self.request('http://synse-prometheus:9243/metrics')
-        self.assertNotEqual(first_response.text, second_response.text)
+        second_response = self.app.get('/metrics')
+        self.assertNotEqual(
+            first_response.get_data(True), second_response.get_data(True))

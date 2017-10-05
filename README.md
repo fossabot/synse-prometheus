@@ -1,20 +1,31 @@
-# Synse-prometheus
+synse-promethus is a prometheus exporter for synse-server's metrics. This enables you to ingest all your metrics into prometheus and use it for alerting/monitoring.
 
-Synse-prometheus provides a standalone docker container/flask app for collecting data from Synse through a Prometheus client, and making that data available to Prometheus servers that would consume it.
+# Kick the tires
 
-## Running and using synse-prometheus
-* To specify which synse-server instance to collect data from, set the SYNSE_SERVER environment variable to the url of the server.
-* Use the command `make run` from inside the primary directory of the repo to launch the container. It should start collecting data from synse-server shortly afterwards. The default interval is 5 minutes.
-* To access the data that synse-prometheus is collecting, send a request to the http://[synse-prometheus' local ip]:9243/metrics endpoint. This is the mechanism through which prometheus servers can retrieve the collected data.
-
-The synse-prometheus container also has a /test endpoint which is used for verifying that the container is working correctly.
-
-## Running a Prometheus server
-Here is a sample configuration file for a Prometheus server that can be run on localhost, or in a Docker container. Complete documentation can be found here: https://prometheus.io/docs/introduction/install/
-
-To run a Prometheus Docker container, create a local configuration file `prometheus.yml` using the snippet below as a template.
-Update the `- targets` field to point to the synse-prometheus container.
+```bash
+make run
 ```
+
+To keep everything tied together, this starts a prometheus server up for you. Send your browser to `http://localhost:9090` and play around.
+
+To stop it, you can run:
+
+```bash
+make down
+```
+
+Note: the default configuration uses the embedded synse-server and ipmi emulator. If you'd like to use a different backend, check out `--help`.
+
+# Usage
+
+```bash
+docker run -it --rm vaporio/synse-prometheus python runserver.py --help
+```
+
+- To specify which synse-graphql instance to collect data from, set the SYNSE_GRAPHQL environment variable to the url of the graphql server.
+- Configure your prometheus server. For more detailed documentation, see the [prometheus docs]. An example config:
+
+```yaml
 global:
   scrape_interval:     15s
 
@@ -25,12 +36,27 @@ scrape_configs:
     scrape_interval: 300s
 
     static_configs:
-      - targets: ['192.168.99.100:9243']
+      - targets: ['synse-prometheus:9243']
 ```
 
-Then use the Docker command below to mount the config file and start the container.
-```
-docker run -p 9090:9090 -v `pwd`/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+# Development
+
+## Run the server
+
+```bash
+make build dev
+python runserver.py
 ```
 
-Prometheus is visible at localhost:9090
+- From outside the container (or inside it), you can run `curl localhost:9243`
+
+## Run the tests (as part of development)
+
+```
+make build dev
+tox
+```
+
+See [nosetests](http://nose.readthedocs.io/en/latest/usage.html) for some more examples. Adding `@attr('now')` to the top of a function is a really convenient way to just run a single test.
+
+[prometheus-docs]: https://prometheus.io/docs/introduction/install/

@@ -8,11 +8,10 @@
      \/apor IO
 """
 
-from prometheus_endpoint import config
-from prometheus_endpoint import main, setup_logging
+from synse_prometheus import app, config
 
 
 if __name__ == '__main__':
     config.parse_args()
-    setup_logging()
-    main()
+    app.setup_logging()
+    app.main()

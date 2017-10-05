@@ -9,12 +9,14 @@
 
 import logging
 from datetime import datetime
+
 import requests
 import prometheus_client
 import prometheus_client.exposition
 from apscheduler.schedulers.background import BackgroundScheduler
 from prometheus_client.core import _INF
 from pytz import utc
+
 from . import config
 
 query = '''{
@@ -150,11 +152,10 @@ def get():
 
 
 def get_query():
-    _synse_server = config.options.get('synse_server')
-    _api_version = config.options.get('api_version')
+    _synse_server = config.options.get('synse_graphql')
     try:
         r = requests.get(
-            'http://{}/synse/{}/graphql'.format(_synse_server, _api_version),
+            'http://{}/graphql'.format(_synse_server),
             params={'query': query}
         )
         return r.json()
