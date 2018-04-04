@@ -1,3 +1,9 @@
+# !! DEPRECATED !!
+This repository is deprecated. Official support for the Prometheus exporter for Synse Server now lives in the [Synse GraphQL](https://github.com/vapor-ware/synse-graphql) repository.
+
+-------------------------
+
+
 synse-prometheus provides a [Prometheus][prometheus] exporter for the metrics being provided by your data center and IT equipment. You can use this, in conjunction with Prometheus to monitor these metrics and alert on them.
 
 # Kick the tires
