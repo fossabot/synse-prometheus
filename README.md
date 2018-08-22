@@ -1,4 +1,6 @@
 # !! DEPRECATED !!
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-prometheus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-prometheus?ref=badge_shield)
+
 This repository is deprecated. Official support for the Prometheus exporter for Synse Server now lives in the [Synse GraphQL](https://github.com/vapor-ware/synse-graphql) repository.
 
 -------------------------
@@ -67,3 +69,7 @@ See [nosetests](http://nose.readthedocs.io/en/latest/usage.html) for some more e
 
 [prometheus-docs]: https://prometheus.io/docs/introduction/install/
 [prometheus]: https://prometheus.io/
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-prometheus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-prometheus?ref=badge_large)
